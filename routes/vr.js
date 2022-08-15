@@ -4,6 +4,9 @@ var VRItem = require('../models/vrModel');
 var Connections = require('../models/connectModel')
 var mongoose = require('mongoose');
 
+var Region = require('../models/regionModel');
+var VRModel = require('../models/vrModel')
+
 /* GET home page. */
 //router.get('/', function(req, res, next) {
 //    res.render('vr', { title: 'Express' });
@@ -48,7 +51,7 @@ router.get('/:vid', function(req, res) {
           linkList = vritem.links;
         }
 
-        console.log('###### linkList');
+        // console.log('###### linkList');
         // console.log(linkList);
         // console.log(circleList[0]);
         //console.log(circleList);
@@ -56,6 +59,17 @@ router.get('/:vid', function(req, res) {
 
         // boxtest는 entityList로 가져옴
         entityList = vritem.boxtest;
+
+        // console.log(req.params.vid)      // 현재 vr_id
+        // console.log(vritem.region_id)    // 현재 region_id
+
+        VRModel.find({region_id: vritem.region_id}, function (err, vrmodels){
+          console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>')
+          for (i in vrmodels){
+            console.log(vrmodels[i]['scene_name'])
+            console.log(vrmodels[i]['_id'])
+          }
+        });
         
         // linkList, objectList render하기
         return res.render("vr_item", { vid:req.params.vid, vrimage_id: vritem.image_file, arrowList:linkList, objectList:entityList });
@@ -67,7 +81,9 @@ router.get('/scene/:scene_name', function(req, res) {
         if (err) return res.status(500).json({ error: err });
         if (!vritem) return res.status(404).json({ error: 'vritem not found' });
 
+          //if 
         //if 
+          //if 
         //var linkList = {left:vritem.left_name, up:vritem.up_name, right:vritem.right_name, down:vritem.down_name};
         //console.log(linkList);
         return res.redirect("/vr/" + vritem._id);
