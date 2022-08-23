@@ -52,9 +52,20 @@ AFRAME.registerComponent('object-link', {
         sceneId: { type: 'string', default: 'none' }
     },
     init: function () {
-        console.log("========================================");
-        console.log(this.data.sceneName);
-        console.log(this.data.sceneId);
+        // console.log("========================================");
+        // console.log(this.data.sceneName);
+        // console.log(this.data.sceneId);
+
+        var HREF = 'http://localhost:3000/vr/';
+
+        var nameList = this.data.sceneName.split(',');
+        var idList = this.data.sceneId.split(',');
+
+        console.log("<<<<<<<<<<<<");
+        console.log(nameList);
+        console.log(idList);
+
+        var sceneDic = { castle: 'sample2', sample3: 'sample3', sample1: 'sample1', sample4: 'sample4' };
 
         this.el.addEventListener('click', function (e) {
 
@@ -79,31 +90,17 @@ AFRAME.registerComponent('object-link', {
                         title: 'Scene 선택',
                         input: 'select',
                         inputOptions: {
-                            'Scene List': {
-                                castle: 'castle',
-                                sample3: 'sample3',
-                                sample1: 'sample1',
-                                sample4: 'sample4'
-                            }
+                            'Scene List': nameList
                         },
                         inputPlaceholder: 'Scene 선택',
                         showCancelButton: true,
                         inputValidator: (value) => {
                             return new Promise((resolve) => {
-                                if (value === 'castle') {
-                                    sceneHref = 'http://localhost:3000/vr/629bacc1ba90c9747c4f3dad#';
-                                    resolve()
-                                } else if (value === 'sample3') {
-                                    sceneHref = 'http://localhost:3000/vr/629f590a39ca221cf005abc7';
-                                    resolve()
-                                } else if (value === 'sample1') {
-                                    sceneHref = 'http://localhost:3000/vr/629bacb5ba90c9747c4f3daa';
-                                    resolve()
-                                } else if (value === 'sample4') {
-                                    sceneHref = 'http://localhost:3000/vr/629c8817577f1f8938d2ac41';
-                                    resolve()
+                                if (value) {
+                                    sceneHref = HREF + idList[value];
+                                    resolve();
                                 } else {
-                                    resolve('연결할 Scene을 선택해주세요!')
+                                    resolve('연결할 Scene을 선택해주세요!');
                                 }
                             })
                         }
