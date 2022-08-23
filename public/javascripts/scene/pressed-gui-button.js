@@ -1,8 +1,6 @@
-
-
 AFRAME.registerComponent('pressed-gui-button', {
 
-    init: function() {
+    init: function () {
         //var sceneEl = document.querySelector('a-scene');
         var objectEl = document.querySelector('#objects');
         var markerEl = document.querySelector('#marker');
@@ -21,12 +19,12 @@ AFRAME.registerComponent('pressed-gui-button', {
 
             var newEl = document.createElement('a-entity');
             newEl.setAttribute('id', 'boxtest');
-            newEl.setAttribute('geometry', {primitive: this.id});
+            newEl.setAttribute('geometry', { primitive: this.id });
             newEl.setAttribute('material', 'color', COLORS[Math.floor(Math.random() * COLORS.length)]); //random color
             newEl.setAttribute('loc', this.id + new Date().getTime() / 100);
 
             objectEl.appendChild(newEl);
-    
+
             //newEl.classList.add('clickable');
             //newEl.addEventListener('click', handleClickEvent);
 
@@ -38,8 +36,7 @@ AFRAME.registerComponent('pressed-gui-button', {
 });
 
 // 해당 오브젝트가 맞는지 확인하는 용
-function handleClickEvent (event)
-{
+function handleClickEvent(event) {
     event.preventDefault();
 
     var obj = event.target;
@@ -50,7 +47,15 @@ function handleClickEvent (event)
 }
 
 AFRAME.registerComponent('object-link', {
-    init: function() {
+    schema: {
+        sceneName: { type: 'string', default: 'none' },
+        sceneId: { type: 'string', default: 'none' }
+    },
+    init: function () {
+        console.log("========================================");
+        console.log(this.data.sceneName);
+        console.log(this.data.sceneId);
+
         this.el.addEventListener('click', function (e) {
 
             var objectEl = document.querySelector('#objects');
@@ -60,67 +65,67 @@ AFRAME.registerComponent('object-link', {
             (async () => {
 
                 const { value: text } = await Swal.fire({
-                  title: 'Link 이름을 입력해주세요',
-                  input: 'text',
-                  inputLabel: '영어로 작성해주세요',
-                  width: 600,
-                  inputPlaceholder: 'Link 이름 작성',
-                  showCancelButton: true
+                    title: 'Link 이름을 입력해주세요',
+                    input: 'text',
+                    inputLabel: '영어로 작성해주세요',
+                    width: 600,
+                    inputPlaceholder: 'Link 이름 작성',
+                    showCancelButton: true
                 })
-                
+
                 if (text) {
                     //list
                     const { value: scene } = await Swal.fire({
                         title: 'Scene 선택',
                         input: 'select',
                         inputOptions: {
-                          'Scene List': {
-                            castle: 'castle',
-                            sample3: 'sample3',
-                            sample1: 'sample1',
-                            sample4: 'sample4'
-                          }
+                            'Scene List': {
+                                castle: 'castle',
+                                sample3: 'sample3',
+                                sample1: 'sample1',
+                                sample4: 'sample4'
+                            }
                         },
                         inputPlaceholder: 'Scene 선택',
                         showCancelButton: true,
                         inputValidator: (value) => {
-                          return new Promise((resolve) => {
-                            if (value === 'castle') {
-                                sceneHref = 'http://localhost:3000/vr/629bacc1ba90c9747c4f3dad#';
-                                resolve()
-                            } else if (value === 'sample3') {
-                                sceneHref = 'http://localhost:3000/vr/629f590a39ca221cf005abc7';
-                                resolve()
-                            } else if (value === 'sample1') {
-                                sceneHref = 'http://localhost:3000/vr/629bacb5ba90c9747c4f3daa';
-                                resolve()
-                            } else if (value === 'sample4') {
-                                sceneHref = 'http://localhost:3000/vr/629c8817577f1f8938d2ac41';
-                                resolve()
-                            } else {
-                                resolve('연결할 Scene을 선택해주세요!')
-                            }
-                          })
+                            return new Promise((resolve) => {
+                                if (value === 'castle') {
+                                    sceneHref = 'http://localhost:3000/vr/629bacc1ba90c9747c4f3dad#';
+                                    resolve()
+                                } else if (value === 'sample3') {
+                                    sceneHref = 'http://localhost:3000/vr/629f590a39ca221cf005abc7';
+                                    resolve()
+                                } else if (value === 'sample1') {
+                                    sceneHref = 'http://localhost:3000/vr/629bacb5ba90c9747c4f3daa';
+                                    resolve()
+                                } else if (value === 'sample4') {
+                                    sceneHref = 'http://localhost:3000/vr/629c8817577f1f8938d2ac41';
+                                    resolve()
+                                } else {
+                                    resolve('연결할 Scene을 선택해주세요!')
+                                }
+                            })
                         }
-                      })
-                      
+                    })
+
                     //   if (scene) {
                     //     Swal.fire(`You selected: ${scene}`)
                     //   }
-                    if(scene) {
+                    if (scene) {
                         const Toast = Swal.mixin({
                             toast: true,
                             position: 'center',
                             showConfirmButton: false,
                             timer: 1000
                         })
-                          
+
                         Toast.fire({
                             icon: 'success',
                             iconColor: '#7066e0',
                             title: 'Link가 생성되었습니다!'
                         })
-                        
+
                         var linkEl = document.createElement('a-entity');
                         linkEl.setAttribute('text', {
                             value: `${text}\n\n\n`,
@@ -129,24 +134,24 @@ AFRAME.registerComponent('object-link', {
                             anchor: 'align',
                             baseline: 'bottom'
                         });
-    
-                        linkEl.setAttribute('geometry', {primitive: 'box'});
+
+                        linkEl.setAttribute('geometry', { primitive: 'box' });
                         linkEl.setAttribute('class', 'clickable');
-                        linkEl.setAttribute('material', {color: 'purple'});
+                        linkEl.setAttribute('material', { color: 'purple' });
                         linkEl.setAttribute('link', 'href', sceneHref);
-    
+
                         var position = markerEl.object3D.getWorldPosition();
                         linkEl.setAttribute('position', position);
                         objectEl.appendChild(linkEl);
                     }
-                } else if(text === '') {
+                } else if (text === '') {
                     const Toast = Swal.mixin({
                         toast: true,
                         position: 'center',
                         showConfirmButton: false,
                         timer: 1000
                     })
-                      
+
                     Toast.fire({
                         icon: 'warning',
                         title: '링크 이름을 입력해주세요!'
