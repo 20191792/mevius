@@ -30239,6 +30239,10 @@
           // save 클릭했을 때 green으로 바꾸기
           // _this5.setAttribute('material', 'color', 'green');
 
+          // scene_id 가져오기
+          var content_save = entity.querySelector('a-gui-button');
+          var scene_id = content_save.getAttribute('contents-save')['scene_id'];
+
           var url = 'scene_update/' + scene_id;
           console.log(url);
           /*$.ajax({
