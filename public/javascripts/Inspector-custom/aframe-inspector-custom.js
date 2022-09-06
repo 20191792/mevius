@@ -16883,6 +16883,7 @@
 
         _this = super(props);
 
+        console.log("colorwidget this : " + this);
         var entity = this.props.entity;
         console.log(entity);
 
@@ -30206,19 +30207,85 @@
     class Main extends _react2.default.Component {
       constructor(props) {
         var _this;
-
         _this = super(props);
-        //
-        this.id = props.componentname + ':' + props.name;
 
-        if (['position', 'rotation', 'scale'].indexOf(this.props.componentname) !== -1) {
-          _Events2.default.on('entitytransformed', (0, _lodash2.default)(function (entity) {
-            if (entity === props.entity) {
-              _this.forceUpdate();
+        // --
+        this.saveSceneObject = function (value) {
+          var entity = _this.state.sceneEl;
+
+          var el1 = document.querySelectorAll('a-link');    // link querySelect
+          var el2 = document.querySelectorAll('#boxtest');  // boxtest querySelect
+          // console.log(el1);
+          // console.log("length:" + el1.length);
+          // console.log(el2);
+          // console.log("length:" + el2.length);
+
+          var jdata = new Object();   // DB로 보낼 jdata
+          var jarray = [];            // boxtest entity 담을 array
+
+          // jdata에 link 넣기
+          el1.forEach(elem => {
+            jdata[elem.getAttribute('loc')] = [elem.getAttribute('position'), elem.getAttribute('rotation')];
+          });
+
+          // jarray에 entity array로 넣기
+          el2.forEach(elem2 => {
+            jarray.push([elem2.getAttribute('position'), elem2.getAttribute('rotation'), elem2.getAttribute('scale'), elem2.getAttribute('id'), elem2.getAttribute('loc'), elem2.getAttribute('geometry').primitive, elem2.getAttribute('material').color]);
+          });
+
+          // jdata에서 key가 boxtest이고, value가 jarray로 넣기
+          jdata['boxtest'] = jarray;
+
+          // save 클릭했을 때 green으로 바꾸기
+          // _this5.setAttribute('material', 'color', 'green');
+
+          var url = 'scene_update/' + scene_id;
+          console.log(url);
+          /*$.ajax({
+              type: "PUT",
+              url: url,
+              data: el1,
+          });*/
+          var xhr = new XMLHttpRequest();
+
+          const getCircularReplacer = () => {
+            const seen = new WeakSet();
+            return (key, value) => {
+              if (typeof value === "object" && value !== null) { // object, array(boxtest)
+                if (seen.has(value)) {
+                  return;
+                }
+                seen.add(value);
+              }
+              return value;
+            };
+          };
+
+          xhr.open('PUT', url, true);
+          xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+          xhr.onreadystatechange = function () { // Call a function when the state changes.
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+              console.log(`responseText : ${xhr.responseText}`); //updated done
             }
-          }, 250));
+          }
+          //console.log(`JSON : ${JSON.stringify(jdata, getCircularReplacer())}`);
+          xhr.send(JSON.stringify(jdata, getCircularReplacer()));
+
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'center',
+            showConfirmButton: false,
+            timer: 1000
+          });
+
+          Toast.fire({
+            icon: 'success',
+            iconColor: '#a5dc86',
+            title: '저장되었습니다'
+          });
         }
-        //
+        // --
         this.onCloseHelpModal = function (value) {
           _this.setState({ isHelpOpen: false });
         };
@@ -30287,50 +30354,6 @@
           _this.forceUpdate();
         });
       }
-      //
-      getWidget() {
-        var props = this.props;
-        var isMap = props.componentname === 'material' && (props.name === 'envMap' || props.name === 'src');
-        var type = props.schema.type;
-
-        var value = props.schema.type === 'selector' ? props.entity.getDOMAttribute(props.componentname)[props.name] : props.data;
-
-        var widgetProps = {
-          componentname: props.componentname,
-          entity: props.entity,
-          isSingle: props.isSingle,
-          name: props.name,
-          // Wrap updateEntity for tracking.
-          onChange: function onChange(name, value) {
-            var propertyName = props.componentname;
-            if (!props.isSingle) {
-              propertyName += '.' + props.name;
-            }
-
-            _entity.updateEntity.apply(this, [props.entity, propertyName, value]);
-          },
-          value: value
-        };
-        var numberWidgetProps = {
-          min: props.schema.hasOwnProperty('min') ? props.schema.min : -Infinity,
-          max: props.schema.hasOwnProperty('max') ? props.schema.max : Infinity
-        };
-
-        if (props.schema.oneOf && props.schema.oneOf.length > 0) {
-          return _react2.default.createElement(_SelectWidget2.default, _extends({}, widgetProps, { options: props.schema.oneOf }));
-        }
-        if (type === 'map' || isMap) {
-          return _react2.default.createElement(_TextureWidget2.default, widgetProps);
-        }
-
-        switch (type) {
-          case 'color':
-            {
-              return _react2.default.createElement(_ColorWidget2.default, widgetProps);
-            }
-        }
-      }
-      //
 
       componentDidMount() {
         var _this2 = this;
@@ -30387,84 +30410,84 @@
         );
       }
 
-      saveSceneObject() {
-        var _this5 = this;
-        console.log(this);
+      // saveSceneObject() {
+      //   var _this5 = this;
+      //   console.log(this);
 
-        var el1 = document.querySelectorAll('a-link');    // link querySelect
-        var el2 = document.querySelectorAll('#boxtest');  // boxtest querySelect
+      //   var el1 = document.querySelectorAll('a-link');    // link querySelect
+      //   var el2 = document.querySelectorAll('#boxtest');  // boxtest querySelect
 
-        // console.log(`el1 & el2 : ${el1} / ${el2}`);
-        console.log("el1 : " + el1[0].value);
+      //   // console.log(`el1 & el2 : ${el1} / ${el2}`);
+      //   console.log("el1 : " + el1[0].value);
 
-        var jdata = new Object();   // DB로 보낼 jdata
-        var jarray = [];            // boxtest entity 담을 array
+      //   var jdata = new Object();   // DB로 보낼 jdata
+      //   var jarray = [];            // boxtest entity 담을 array
 
-        // jdata에 link 넣기
-        for (elem of el1) {
-          console.log('links');
-          jdata[elem.getAttribute('loc')] = [elem.getAttribute('position'), elem.getAttribute('rotation')];
-        }
-        console.log("jdata" + jdata);
-        // console.log(`jdata : ${jdata}`);
+      //   // jdata에 link 넣기
+      //   for (elem of el1) {
+      //     console.log('links');
+      //     jdata[elem.getAttribute('loc')] = [elem.getAttribute('position'), elem.getAttribute('rotation')];
+      //   }
+      //   console.log("jdata" + jdata);
+      //   // console.log(`jdata : ${jdata}`);
 
-        // jarray에 entity array로 넣기
-        for (elem2 of el2) {
-          jarray.push([elem2.getAttribute('position'), elem2.getAttribute('rotation'), elem2.getAttribute('scale'), elem2.getAttribute('id'), elem2.getAttribute('loc'), elem2.getAttribute('geometry').primitive, elem2.getAttribute('material').color]);
-        }
+      //   // jarray에 entity array로 넣기
+      //   for (elem2 of el2) {
+      //     jarray.push([elem2.getAttribute('position'), elem2.getAttribute('rotation'), elem2.getAttribute('scale'), elem2.getAttribute('id'), elem2.getAttribute('loc'), elem2.getAttribute('geometry').primitive, elem2.getAttribute('material').color]);
+      //   }
 
-        // jdata에서 key가 boxtest이고, value가 jarray로 넣기
-        jdata['boxtest'] = jarray;
+      //   // jdata에서 key가 boxtest이고, value가 jarray로 넣기
+      //   jdata['boxtest'] = jarray;
 
-        // save 클릭했을 때 green으로 바꾸기
-        // _this5.setAttribute('material', 'color', 'green');
+      //   // save 클릭했을 때 green으로 바꾸기
+      //   // _this5.setAttribute('material', 'color', 'green');
 
-        var url = 'scene_update/' + this.data.scene_id;
-        console.log(url);
-        /*$.ajax({
-            type: "PUT",
-            url: url,
-            data: el1,
-        });*/
-        var xhr = new XMLHttpRequest();
+      //   var url = 'scene_update/' + this.data.scene_id;
+      //   console.log(url);
+      //   /*$.ajax({
+      //       type: "PUT",
+      //       url: url,
+      //       data: el1,
+      //   });*/
+      //   var xhr = new XMLHttpRequest();
 
-        const getCircularReplacer = () => {
-          const seen = new WeakSet();
-          return (key, value) => {
-            if (typeof value === "object" && value !== null) { // object, array(boxtest)
-              if (seen.has(value)) {
-                return;
-              }
-              seen.add(value);
-            }
-            return value;
-          };
-        };
+      //   const getCircularReplacer = () => {
+      //     const seen = new WeakSet();
+      //     return (key, value) => {
+      //       if (typeof value === "object" && value !== null) { // object, array(boxtest)
+      //         if (seen.has(value)) {
+      //           return;
+      //         }
+      //         seen.add(value);
+      //       }
+      //       return value;
+      //     };
+      //   };
 
-        xhr.open('PUT', url, true);
-        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+      //   xhr.open('PUT', url, true);
+      //   xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
 
-        xhr.onreadystatechange = function () { // Call a function when the state changes.
-          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            console.log(`responseText : ${xhr.responseText}`); //updated done
-          }
-        }
-        //console.log(`JSON : ${JSON.stringify(jdata, getCircularReplacer())}`);
-        xhr.send(JSON.stringify(jdata, getCircularReplacer()));
+      //   xhr.onreadystatechange = function () { // Call a function when the state changes.
+      //     if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+      //       console.log(`responseText : ${xhr.responseText}`); //updated done
+      //     }
+      //   }
+      //   //console.log(`JSON : ${JSON.stringify(jdata, getCircularReplacer())}`);
+      //   xhr.send(JSON.stringify(jdata, getCircularReplacer()));
 
-        const Toast = Swal.mixin({
-          toast: true,
-          position: 'center',
-          showConfirmButton: false,
-          timer: 1000
-        });
+      //   const Toast = Swal.mixin({
+      //     toast: true,
+      //     position: 'center',
+      //     showConfirmButton: false,
+      //     timer: 1000
+      //   });
 
-        Toast.fire({
-          icon: 'success',
-          iconColor: '#a5dc86',
-          title: '저장되었습니다'
-        });
-      }
+      //   Toast.fire({
+      //     icon: 'success',
+      //     iconColor: '#a5dc86',
+      //     title: '저장되었습니다'
+      //   });
+      // }
 
       render() {
         // 추가한 부분 -------------------------
@@ -30485,13 +30508,6 @@
         var toggleButtonText = this.state.inspectorEnabled ? 'Scene mode' : 'Edit mode';
         var entity = this.props.entity;
         var props = this.props;
-
-        // console.log(JSON.stringify(scene, null, 2));
-        // console.log(JSON.stringify(entity));
-        // console.log(JSON.stringify(this.props));
-
-        //var value = props.schema.type === 'selector' ? props.entity.getDOMAttribute(props.componentname)[props.name] : JSON.stringify(props.data);
-        //var title = props.name + '\n - type: ' + props.schema.type + '\n - value: ' + value;
 
         return _react2.default.createElement(
           'div',

@@ -29,8 +29,8 @@ AFRAME.registerComponent('contents-save', {
       var el2 = document.querySelectorAll('#boxtest');  // boxtest querySelect
 
       console.log(self);
-      console.log(el1[0]);
-      // console.log(`el1 & el2 : ${el1} / ${el2}`);
+      console.log(el1);
+      console.log(el2);
 
       var jdata = new Object();   // DB로 보낼 jdata
       var jarray = [];            // boxtest entity 담을 array
@@ -76,7 +76,7 @@ AFRAME.registerComponent('contents-save', {
       this.setAttribute('material', 'color', 'green');
 
       //console.log('I was clicked at: ', evt.detail.intersection.point);
-
+      console.log(self.data);
       var url = 'scene_update/' + self.data.scene_id;
       console.log(url);
       /*$.ajax({
