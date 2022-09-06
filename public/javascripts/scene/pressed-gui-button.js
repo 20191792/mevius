@@ -36,15 +36,15 @@ AFRAME.registerComponent('pressed-gui-button', {
 });
 
 // 해당 오브젝트가 맞는지 확인하는 용
-function handleClickEvent(event) {
-    event.preventDefault();
+// function handleClickEvent(event) {
+//     event.preventDefault();
 
-    var obj = event.target;
+//     var obj = event.target;
 
-    console.log(obj.id);
-    console.dir(obj);
-    //- console.log(obj.getAttribute("position"));
-}
+//     console.log(obj.id);
+//     console.dir(obj);
+//     //- console.log(obj.getAttribute("position"));
+// }
 
 AFRAME.registerComponent('object-link', {
     schema: {
@@ -61,11 +61,9 @@ AFRAME.registerComponent('object-link', {
         var nameList = this.data.sceneName.split(',');
         var idList = this.data.sceneId.split(',');
 
-        console.log("<<<<<<<<<<<<");
-        console.log(nameList);
-        console.log(idList);
-
-        var sceneDic = { castle: 'sample2', sample3: 'sample3', sample1: 'sample1', sample4: 'sample4' };
+        // console.log("<<<<<<<<<<<<");
+        // console.log(nameList);
+        // console.log(idList);
 
         this.el.addEventListener('click', function (e) {
 

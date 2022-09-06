@@ -5,30 +5,32 @@
  * back in.
  */
 AFRAME.registerComponent('contents-save', {
-    schema: {
-        scene_id: {type: 'string', default:"hello"},
-    },
-/*
-    init: function () {
-        var data = this.data;
-        var el = this.el;
-
-        this.el.addEventListener('click', function (event) {
-            event.preventDefault();
-            // Fade out image.
-            window.location = data.url;
-            // Wait for fade to complete.
-        });
-    },*/
-  init: function () {
+  schema: {
+    scene_id: { type: 'string', default: "hello" },
+  },
+  /*
+      init: function () {
+          var data = this.data;
+          var el = this.el;
   
+          this.el.addEventListener('click', function (event) {
+              event.preventDefault();
+              // Fade out image.
+              window.location = data.url;
+              // Wait for fade to complete.
+          });
+      },*/
+  init: function () {
+
     var self = this;
 
     this.el.addEventListener('click', function (evt) {
       var el1 = document.querySelectorAll('a-link');    // link querySelect
       var el2 = document.querySelectorAll('#boxtest');  // boxtest querySelect
 
-      // console.log(el2);
+      console.log(self);
+      console.log(el1[0]);
+      // console.log(`el1 & el2 : ${el1} / ${el2}`);
 
       var jdata = new Object();   // DB로 보낼 jdata
       var jarray = [];            // boxtest entity 담을 array
@@ -39,16 +41,15 @@ AFRAME.registerComponent('contents-save', {
       //jdata.down   = el1[3].getAttribute('position');
 
       // jdata에 link 넣기
-      for(elem of el1)
-      {
-        console.log('links')
+      for (elem of el1) {
         // jdata[elem.getAttribute('title')] = [elem.getAttribute('position'), elem.getAttribute('rotation')];
         jdata[elem.getAttribute('loc')] = [elem.getAttribute('position'), elem.getAttribute('rotation')];
       }
+      console.log(jdata);
+      // console.log(`jdata : ${jdata}`);
 
       // jarray에 entity array로 넣기
-      for(elem2 of el2)
-      {
+      for (elem2 of el2) {
         // jarray.push([elem2.getAttribute('position'), elem2.getAttribute('rotation'), elem2.getAttribute('id'), elem2.getAttribute('loc'), elem2.getAttribute('geometry').primitive, elem2.getAttribute('material').color]);
 
         jarray.push([elem2.getAttribute('position'), elem2.getAttribute('rotation'), elem2.getAttribute('scale'), elem2.getAttribute('id'), elem2.getAttribute('loc'), elem2.getAttribute('geometry').primitive, elem2.getAttribute('material').color]);
@@ -70,7 +71,7 @@ AFRAME.registerComponent('contents-save', {
 
       // for(elem of el1){console.log(`jdata id : ${jdata}`);}
       // console.log(el2.getAttribute('position'))
-      
+
       // save 클릭했을 때 green으로 바꾸기
       this.setAttribute('material', 'color', 'green');
 
@@ -84,43 +85,58 @@ AFRAME.registerComponent('contents-save', {
           data: el1,
       });*/
       var xhr = new XMLHttpRequest();
-      
+
       const getCircularReplacer = () => {
-      const seen = new WeakSet();
-      return (key, value) => {
-        if (typeof value === "object" && value !== null) { // object, array(boxtest)
-          if (seen.has(value)) {
-            return;
+        const seen = new WeakSet();
+        return (key, value) => {
+          if (typeof value === "object" && value !== null) { // object, array(boxtest)
+            if (seen.has(value)) {
+              return;
+            }
+            seen.add(value);
           }
-          seen.add(value);
-        }
-        return value;
+          return value;
+        };
       };
-    };
 
-      xhr.open('PUT', url, true);
-      xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8'); 
-      
-      xhr.onreadystatechange = function() { // Call a function when the state changes.
+      try {
+        xhr.open('PUT', url, true);
+        xhr.setRequestHeader('Content-Type', 'application/json; charset=utf-8');
+
+        xhr.onreadystatechange = function () { // Call a function when the state changes.
           if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-              console.log(`responseText : ${xhr.responseText}`); //updated done
+            console.log(`responseText : ${xhr.responseText}`); //updated done
           }
-      }
-      //console.log(`JSON : ${JSON.stringify(jdata, getCircularReplacer())}`);
-      xhr.send(JSON.stringify(jdata, getCircularReplacer()));
+        }
+        //console.log(`JSON : ${JSON.stringify(jdata, getCircularReplacer())}`);
+        xhr.send(JSON.stringify(jdata, getCircularReplacer()));
 
-      const Toast = Swal.mixin({
-        toast: true,
-        position: 'center',
-        showConfirmButton: false,
-        timer: 1000
-      })
-      
-      Toast.fire({
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 1000
+        });
+
+        Toast.fire({
           icon: 'success',
-          iconColor: '#7066e0',
+          iconColor: '#a5dc86',
           title: '저장되었습니다'
-      })
+        });
+      } catch (error) {
+        const Toast = Swal.mixin({
+          toast: true,
+          position: 'center',
+          showConfirmButton: false,
+          timer: 1000
+        });
+
+        Toast.fire({
+          icon: 'error',
+          iconColor: '#f27474',
+          title: '저장에 실패했습니다'
+        });
+      }
     });
   }
 });
